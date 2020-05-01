@@ -4,6 +4,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+
 import javax.validation.Valid;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,14 +14,20 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.bind.annotation.*;
 
+import server.tech_companion.models.Customer;
+import server.tech_companion.models.DispatchHelper;
 import server.tech_companion.models.WorkOrder;
+import server.tech_companion.services.CustomerService;
 import server.tech_companion.services.WorkOrderService;
 
+@CrossOrigin(origins = { "http://localhost:9080", "http://localhost:8080" })
 @RestController
 @RequestMapping("/api")
 public class WorkOrderController {
     @Autowired
     private WorkOrderService workOrderService;
+    @Autowired
+    private CustomerService customerService;
 
     // get all for one tech on a date
     @GetMapping("/{tech}/{date}")
@@ -55,16 +63,16 @@ public class WorkOrderController {
         }
     }
 
-    // create work order
-    @PostMapping("/dispatch/{tech}")
-    public ResponseEntity<WorkOrder> dispatchWorkOrder(@PathVariable String tech, @Valid @RequestBody WorkOrder json)
+    // create work order - working 4/29
+    @PostMapping("/dispatch/work-order")
+    public ResponseEntity<WorkOrder> dispatchWorkOrder(@Valid @RequestBody DispatchHelper json)
             throws URISyntaxException {
 
-        WorkOrder workOrder = workOrderService.dispatchWorkOrder(tech, json);
+        WorkOrder workOrder = workOrderService.dispatchWorkOrder(json);
         if (workOrder == null) {
             return ResponseEntity.notFound().build();
         } else {
-            URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/dispatch/{tech}")
+            URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/dispatch/work-order")
                     .buildAndExpand(workOrder.get_id()).toUri();
 
             return ResponseEntity.created(uri).body(workOrder);
@@ -95,9 +103,26 @@ public class WorkOrderController {
     }
 
     // delete one work order
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object> deleteWorkOrder(@PathVariable ObjectId id) {
-        workOrderService.deleteWorkOrder(id);
+    @DeleteMapping("/work-order/{id}")
+    public ResponseEntity<?> deleteWorkOrder(@PathVariable String id) throws URISyntaxException {
+        workOrderService.deleteWorkOrder(new ObjectId(id));
         return ResponseEntity.noContent().build();
+    }
+
+    /************
+    **Customers**
+    *************/
+
+    // find a customer
+    @PostMapping("/findCustomer")
+    public ResponseEntity<Customer> findCustomer(@Valid @RequestBody Map<String, String> serviceAddressInfo) {
+        System.out.println(serviceAddressInfo.get("serviceAddress"));
+        Customer customer = customerService.fetchCustomerByServiceAddress(serviceAddressInfo.get("serviceAddress"));
+        System.out.println(customer);
+        if (customer == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(customer);
+        }
     }
 }

@@ -10,7 +10,7 @@ import server.tech_companion.models.Customer;
 
 @Repository
 public interface CustomerRepository extends MongoRepository<Customer, ObjectId> {
-    Customer findByStreetAddress(String streetAddress);
+    Customer findByServiceAddress(String serviceAddress);
 
     List<Customer> findAll();
 }

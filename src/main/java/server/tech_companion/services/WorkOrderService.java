@@ -12,6 +12,8 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import server.tech_companion.models.Customer;
+import server.tech_companion.models.DispatchHelper;
 import server.tech_companion.models.SafetyChecklist;
 import server.tech_companion.models.WorkOrder;
 import server.tech_companion.repositories.WorkOrderRepo;
@@ -22,6 +24,8 @@ public class WorkOrderService {
     private WorkOrderRepo workOrderRepo;
     @Autowired
     private SafetyChecklistService checklistService;
+    @Autowired
+    private CustomerService customerService;
 
     public WorkOrderService(WorkOrderRepo workOrderRepo) {
         this.workOrderRepo = workOrderRepo;
@@ -42,32 +46,35 @@ public class WorkOrderService {
         return workOrderRepo.findAll();
     }
 
-    // delete one work order
+    // delete one work order - completed 4/30
     public void deleteWorkOrder(ObjectId id) {
         workOrderRepo.delete(workOrderRepo.findBy_id(id));
     }
 
     // create work order
-    public WorkOrder dispatchWorkOrder(String techAssigned, WorkOrder json) {
+    public WorkOrder dispatchWorkOrder(DispatchHelper json) {
         WorkOrder workOrder = new WorkOrder();
         ObjectId new_id = ObjectId.get();
         workOrder.set_id(new_id);
-        workOrder.setString_id(new_id.toHexString());
+        workOrder.setString_id(new_id.toString());
         copyNonNullProperties(json, workOrder);
+        Customer customer = json.getCustomer();
 
         // find and attach relevant safety checklists
-        String serviceAddress = json.getCustomer().getStreetAddress() + " " + json.getCustomer().getCity()
-                + ", " + json.getCustomer().getZipCode();
+        String serviceAddress = customer.getStreetAddress() + " " + customer.getCity()
+                + ", CA " + customer.getZipCode();
+        workOrder.getCustomer().setServiceAddress(serviceAddress);
         List<SafetyChecklist> allChecklistsInDb = checklistService.fetchListsByServiceAddress(serviceAddress);
         if (allChecklistsInDb.isEmpty()) {
             System.out.println("empty checklist");
-            workOrder.setSafetyChecklists(checklistService.initializeLists(json.getCustomer()));
+            workOrder.setSafetyChecklists(checklistService.initializeLists(customer));
         } else {
             System.out.println("exisitng checklists");
             workOrder.setSafetyChecklists(allChecklistsInDb);
         }
 
         workOrderRepo.save(workOrder);
+        customerService.upsertCustomer(customer);
 
         return workOrder;
     }
@@ -77,6 +84,10 @@ public class WorkOrderService {
         WorkOrder workOrder = workOrderRepo.findBy_id(new ObjectId(id));
         copyNonNullProperties(json, workOrder);
 
+        Customer customer = json.getCustomer();
+        String serviceAddress = customer.getStreetAddress() + " " + customer.getCity()
+                + ", CA " + customer.getZipCode();
+        workOrder.getCustomer().setServiceAddress(serviceAddress);
         workOrderRepo.save(workOrder);
 
         return workOrder;
@@ -88,6 +99,7 @@ public class WorkOrderService {
         copyNonNullProperties(json, workOrder);
 
         workOrderRepo.save(workOrder);
+        customerService.upsertCustomer(json.getCustomer());
         return workOrder;
     }
 

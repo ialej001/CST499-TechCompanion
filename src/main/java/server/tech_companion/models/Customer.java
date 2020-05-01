@@ -27,6 +27,7 @@ public class Customer {
     private Integer zipCode;
     @NonNull
     private String propertyType;
+    private String serviceAddress;
 
     // customer info
     @NonNull

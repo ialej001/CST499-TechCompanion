@@ -9,5 +9,4 @@ public class TechCompanionApp {
 	public static void main(String[] args) {
 		SpringApplication.run(TechCompanionApp.class, args);
 	}
-
 }

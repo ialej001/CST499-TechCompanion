@@ -20,7 +20,7 @@ public class WorkOrder {
     private String string_id;
 
     private Customer customer;
-    private String descriptionOfProblem;
+    private List<Issue> issues;
 
     // technician input
     private String techAssigned;
@@ -31,3 +31,6 @@ public class WorkOrder {
     private LocalTime timeEnded;
     private LocalDate date;
 }
+
+
+

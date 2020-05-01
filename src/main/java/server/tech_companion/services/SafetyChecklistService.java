@@ -31,15 +31,15 @@ public class SafetyChecklistService {
 
     public List<SafetyChecklist> initializeLists(Customer customer) {
         List<SafetyChecklist> lists = new ArrayList<>();
-        List<String> locations = customer.getGateLocations();
+        List<String> gateLocations = customer.getGateLocations();
 
-        for (int i = 0; i < locations.size(); i++) {
+        for (int i = 0; i < gateLocations.size(); i++) {
             SafetyChecklist newChecklist = new SafetyChecklist();
             newChecklist.set_id(ObjectId.get());
-            String serviceAddress = customer.getStreetAddress() + " " + customer.getCity() + ", "
+            String serviceAddress = customer.getStreetAddress() + " " + customer.getCity() + ", CA"
                     + customer.getZipCode();
 
-            newChecklist.setLocationOfGate(locations.get(i));
+            newChecklist.setLocationOfGate(gateLocations.get(i));
             newChecklist.setServiceAddress(serviceAddress);
             newChecklist.setTypeOfGate(customer.getGateType().get(i));
             newChecklist.setOperatorModel(customer.getOperatorModel().get(i));

@@ -116,9 +116,7 @@ public class WorkOrderController {
     // find a customer
     @PostMapping("/findCustomer")
     public ResponseEntity<Customer> findCustomer(@Valid @RequestBody Map<String, String> serviceAddressInfo) {
-        System.out.println(serviceAddressInfo.get("serviceAddress"));
         Customer customer = customerService.fetchCustomerByServiceAddress(serviceAddressInfo.get("serviceAddress"));
-        System.out.println(customer);
         if (customer == null) {
             return ResponseEntity.notFound().build();
         } else {

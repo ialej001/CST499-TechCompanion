@@ -31,7 +31,8 @@ public class WorkOrderController {
 
     // get all for one tech on a date
     @GetMapping("/{tech}/{date}")
-    public ResponseEntity<List<WorkOrder>> fetchAllForTechOnDate(@PathVariable String tech, @PathVariable LocalDate date) {
+    public ResponseEntity<List<WorkOrder>> fetchAllForTechOnDate(@PathVariable String tech,
+            @PathVariable LocalDate date) {
         List<WorkOrder> workOrders = workOrderService.fetchAllForTechOnDate(tech, date);
         if (workOrders.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -81,7 +82,8 @@ public class WorkOrderController {
 
     // update one work order
     @PutMapping("/update/{id}")
-    public ResponseEntity<WorkOrder> updateWorkOrderFromOffice(@PathVariable String id, @Valid @RequestBody WorkOrder json) {
+    public ResponseEntity<WorkOrder> updateWorkOrderFromOffice(@PathVariable String id,
+            @Valid @RequestBody WorkOrder json) {
         WorkOrder updatedWorkOrder = workOrderService.updateWorkOrderFromOffice(id, json);
         if (updatedWorkOrder == null) {
             return ResponseEntity.notFound().build();
@@ -110,17 +112,15 @@ public class WorkOrderController {
     }
 
     /************
-    **Customers**
-    *************/
+     ** Customers**
+     *************/
 
     // find a customer
     @PostMapping("/findCustomer")
-    public ResponseEntity<Customer> findCustomer(@Valid @RequestBody Map<String, String> serviceAddressInfo) {
-        Customer customer = customerService.fetchCustomerByServiceAddress(serviceAddressInfo.get("serviceAddress"));
-        if (customer == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(customer);
-        }
+    public ResponseEntity<List<Customer>> findCustomer(@Valid @RequestBody Map<String, String> addressInfo) {
+        System.out.println(addressInfo);
+        List<Customer> customers = customerService.fetchCustomerByStreetAddress(addressInfo.get("streetAddress"));
+        System.out.println(customers);
+        return ResponseEntity.ok(customers);
     }
 }

@@ -41,8 +41,8 @@ public class SafetyChecklistService {
 
             newChecklist.setLocationOfGate(gateLocations.get(i));
             newChecklist.setServiceAddress(serviceAddress);
-            newChecklist.setTypeOfGate(customer.getGateType().get(i));
-            newChecklist.setOperatorModel(customer.getOperatorModel().get(i));
+            // newChecklist.setTypeOfGate(customer.getGateType().get(i));
+            // newChecklist.setOperatorModel(customer.getOperatorModel().get(i));
             lists.add(newChecklist);
             checklistRepo.save(newChecklist);
         }

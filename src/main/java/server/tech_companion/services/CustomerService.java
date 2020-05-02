@@ -1,5 +1,7 @@
 package server.tech_companion.services;
 
+import java.util.List;
+
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,10 @@ public class CustomerService {
 
     public Customer fetchCustomerByServiceAddress(String serviceAddress) {
         return customerRepo.findByServiceAddress(serviceAddress);
+    }
+
+    public List<Customer> fetchCustomerByStreetAddress(String streetAddress) {
+        return customerRepo.findByStreetAddress(streetAddress);
     }
 
     public void upsertCustomer(Customer customer) {

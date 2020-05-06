@@ -5,25 +5,13 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-
-import org.springframework.http.MediaType;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import graphql.ExecutionInput;
-import graphql.ExecutionResult;
-import graphql.GraphQL;
-import graphql.schema.GraphQLSchema;
-import io.leangen.graphql.GraphQLSchemaGenerator;
-
 import org.springframework.web.bind.annotation.*;
-
 import server.tech_companion.models.Customer;
 import server.tech_companion.models.DispatchHelper;
 import server.tech_companion.models.WorkOrder;
@@ -31,7 +19,7 @@ import server.tech_companion.services.CustomerService;
 import server.tech_companion.services.WorkOrderService;
 
 @CrossOrigin(origins = { "http://localhost:9080", "http://localhost:8080" })
-@RestController
+//@RestController
 @RequestMapping("/api")
 public class WorkOrderController {
     @Autowired
@@ -132,29 +120,5 @@ public class WorkOrderController {
         List<Customer> customers = customerService.fetchCustomerByStreetAddress(addressInfo.get("streetAddress"));
         System.out.println(customers);
         return ResponseEntity.ok(customers);
-    }
-
-    // graph ql stuff
-    private final GraphQL graphQL;
-
-    @Autowired
-    public WorkOrderController(CustomerService customerService) {
-
-        GraphQLSchema schema = new GraphQLSchemaGenerator().withBasePackages("server/tech_companion")
-        .withOperationsFromSingleton(customerService).generate();
-
-        graphQL = GraphQL.newGraphQL(schema).build();
-    }
-
-    @PostMapping(value = "/graphql", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public Map<String, Object> index(@RequestBody Map<String, String> request, HttpServletRequest raw) {
-        ExecutionResult executionResult = graphQL.execute(ExecutionInput.newExecutionInput()
-        .query(request.get("query"))
-        .operationName(request.get("operationName"))
-        .context(raw)
-        .build());
-
-        return executionResult.toSpecification();
-    }
+    } 
 }

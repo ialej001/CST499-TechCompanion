@@ -10,8 +10,12 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import io.leangen.graphql.annotations.GraphQLArgument;
+import io.leangen.graphql.annotations.GraphQLQuery;
+import io.leangen.graphql.spqr.spring.annotations.GraphQLApi;
 import server.tech_companion.models.Customer;
 import server.tech_companion.models.DispatchHelper;
 import server.tech_companion.models.SafetyChecklist;
@@ -19,6 +23,8 @@ import server.tech_companion.models.WorkOrder;
 import server.tech_companion.repositories.WorkOrderRepo;
 
 @Service
+@Component
+@GraphQLApi
 public class WorkOrderService {
     @Autowired
     private WorkOrderRepo workOrderRepo;
@@ -37,11 +43,13 @@ public class WorkOrderService {
     }
 
     // get all for one tech
-    public List<WorkOrder> fetchAllForTech(String tech) {
+    @GraphQLQuery(name = "workOrder")
+    public List<WorkOrder> fetchAllForTech(@GraphQLArgument(name = "tech") String tech) {
         return workOrderRepo.findByTechAssigned(tech);
     }
 
     // get all
+    @GraphQLQuery(name = "workOrders")
     public List<WorkOrder> fetchAll() {
         return workOrderRepo.findAll();
     }

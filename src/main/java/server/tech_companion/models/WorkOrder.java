@@ -1,7 +1,6 @@
 package server.tech_companion.models;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import org.bson.types.ObjectId;
@@ -25,7 +24,7 @@ public class WorkOrder {
     @GraphQLQuery(name = "_id", description = "optional")
     private String string_id;
     @GraphQLQuery(name = "isCompleted")
-    private Boolean isCompleted = false;
+    private Boolean isCompleted;
 
     @GraphQLQuery(name = "customer", description = "optional")
     private Customer customer;

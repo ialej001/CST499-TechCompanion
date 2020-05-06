@@ -42,7 +42,12 @@ public class WorkOrderService {
         return workOrderRepo.findByTechAssignedAndDate(tech, date);
     }
 
-    // get all for one tech
+    // get all uncompleted for one tech
+    @GraphQLQuery(name = "getIncompleteWorkOrders")
+    public List<WorkOrder> fetchIncompleteWO(@GraphQLArgument(name = "isCompleted") Boolean isCompleted) {
+        return workOrderRepo.findByIsCompleted(isCompleted);
+    }
+
     @GraphQLQuery(name = "workOrder")
     public List<WorkOrder> fetchAllForTech(@GraphQLArgument(name = "tech") String tech) {
         return workOrderRepo.findByTechAssigned(tech);
@@ -69,8 +74,8 @@ public class WorkOrderService {
         Customer customer = json.getCustomer();
 
         // find and attach relevant safety checklists
-        String serviceAddress = customer.getStreetAddress() + " " + customer.getCity()
-                + ", CA " + customer.getZipCode();
+        String serviceAddress = customer.getStreetAddress() + " " + customer.getCity() + ", CA "
+                + customer.getZipCode();
         workOrder.getCustomer().setServiceAddress(serviceAddress);
         List<SafetyChecklist> allChecklistsInDb = checklistService.fetchListsByServiceAddress(serviceAddress);
         if (allChecklistsInDb.isEmpty()) {
@@ -93,8 +98,8 @@ public class WorkOrderService {
         copyNonNullProperties(json, workOrder);
 
         Customer customer = json.getCustomer();
-        String serviceAddress = customer.getStreetAddress() + " " + customer.getCity()
-                + ", CA " + customer.getZipCode();
+        String serviceAddress = customer.getStreetAddress() + " " + customer.getCity() + ", CA "
+                + customer.getZipCode();
         workOrder.getCustomer().setServiceAddress(serviceAddress);
         workOrderRepo.save(workOrder);
 
@@ -115,11 +120,11 @@ public class WorkOrderService {
     public static void copyNonNullProperties(Object src, Object target) {
         BeanUtils.copyProperties(src, target, getNullPropertyNames(src));
     }
-    
+
     public static String[] getNullPropertyNames(Object source) {
         final BeanWrapper src = new BeanWrapperImpl(source);
         PropertyDescriptor[] pds = src.getPropertyDescriptors();
-    
+
         Set<String> emptyNames = new HashSet<String>();
         for (PropertyDescriptor pd : pds) {
             Object srcValue = src.getPropertyValue(pd.getName());

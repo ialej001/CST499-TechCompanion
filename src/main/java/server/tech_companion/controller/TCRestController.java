@@ -19,9 +19,9 @@ import server.tech_companion.services.CustomerService;
 import server.tech_companion.services.WorkOrderService;
 
 @CrossOrigin(origins = { "http://localhost:9080", "http://localhost:8080" })
-//@RestController
+@RestController
 @RequestMapping("/api")
-public class WorkOrderController {
+public class TCRestController {
     @Autowired
     private WorkOrderService workOrderService;
     @Autowired

@@ -17,4 +17,6 @@ public interface WorkOrderRepo extends MongoRepository<WorkOrder, ObjectId>
     List<WorkOrder> findByTechAssigned(String tech);
 
     WorkOrder findBy_id(ObjectId _id);
+
+    List<WorkOrder> findByIsCompleted(Boolean isCompleted);
 }

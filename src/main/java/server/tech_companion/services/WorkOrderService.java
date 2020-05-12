@@ -14,12 +14,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import io.leangen.graphql.annotations.GraphQLArgument;
+import io.leangen.graphql.annotations.GraphQLMutation;
 import io.leangen.graphql.annotations.GraphQLQuery;
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi;
 import server.tech_companion.models.Customer;
 import server.tech_companion.models.DispatchHelper;
+import server.tech_companion.models.Part;
 import server.tech_companion.models.SafetyChecklist;
 import server.tech_companion.models.WorkOrder;
+import server.tech_companion.repositories.PartsRepository;
 import server.tech_companion.repositories.WorkOrderRepo;
 
 @Service
@@ -28,6 +31,8 @@ import server.tech_companion.repositories.WorkOrderRepo;
 public class WorkOrderService {
     @Autowired
     private WorkOrderRepo workOrderRepo;
+    @Autowired
+    private PartsRepository partsRepo;
     @Autowired
     private SafetyChecklistService checklistService;
     @Autowired
@@ -86,6 +91,7 @@ public class WorkOrderService {
             workOrder.setSafetyChecklists(allChecklistsInDb);
         }
 
+        workOrder.setIsCompleted(false);
         workOrderRepo.save(workOrder);
         customerService.upsertCustomer(customer);
 
@@ -107,8 +113,9 @@ public class WorkOrderService {
     }
 
     // update workorder from tech
-    public WorkOrder completeWorkOrder(String id, WorkOrder json) {
-        WorkOrder workOrder = workOrderRepo.findBy_id(new ObjectId(id));
+    @GraphQLMutation(name = "completeWorkOrder")
+    public WorkOrder completeWorkOrder(@GraphQLArgument(name = "workOrder") WorkOrder json) {
+        WorkOrder workOrder = workOrderRepo.findBy_id(new ObjectId(json.getString_id()));
         copyNonNullProperties(json, workOrder);
 
         workOrderRepo.save(workOrder);
@@ -116,6 +123,12 @@ public class WorkOrderService {
         return workOrder;
     }
 
+    // parts database access
+    @GraphQLQuery(name = "parts")
+    public List<Part> getParts() {
+    	return partsRepo.findAll();
+    }
+    
     // some helper methods - code refactored
     public static void copyNonNullProperties(Object src, Object target) {
         BeanUtils.copyProperties(src, target, getNullPropertyNames(src));

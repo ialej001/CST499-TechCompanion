@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 public class WorkOrder {
     @Id
     private ObjectId _id;
-    @GraphQLQuery(name = "_id", description = "optional")
+    @GraphQLQuery(name = "string_id", description = "optional")
     private String string_id;
     @GraphQLQuery(name = "isCompleted")
     private Boolean isCompleted;

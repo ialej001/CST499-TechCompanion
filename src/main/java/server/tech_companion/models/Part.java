@@ -3,19 +3,24 @@ package server.tech_companion.models;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
-@Getter @Setter
+@NoArgsConstructor
+@Data
 @Document(collection = "parts")
 public class Part {
     @Id
     private ObjectId _id;
+    @GraphQLQuery(name = "partNumber")
     private String partNumber;
+    @GraphQLQuery(name = "description")
     private String description;
     private String name;
+    @GraphQLQuery(name = "price")
     private Double price;
     private Integer quantity;
 

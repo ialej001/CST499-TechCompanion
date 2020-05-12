@@ -94,7 +94,7 @@ public class TCRestController {
     @PutMapping("/complete/{id}")
     public ResponseEntity<WorkOrder> completeWorkOrder(@PathVariable String id, @Valid @RequestBody WorkOrder json) {
         // System.out.println(json.toString());
-        WorkOrder updatedWorkOrder = workOrderService.completeWorkOrder(id, json);
+        WorkOrder updatedWorkOrder = workOrderService.completeWorkOrder(json);
         if (updatedWorkOrder == null) {
             return ResponseEntity.notFound().build();
         } else {

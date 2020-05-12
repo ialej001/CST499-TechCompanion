@@ -16,11 +16,3 @@ public class DispatchHelper {
     private String techAssigned;
 }
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
-class Issue {
-    private String location;
-    private String problem;
-}
-

@@ -1,6 +1,6 @@
 package server.tech_companion.repositories;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -12,7 +12,7 @@ import server.tech_companion.models.WorkOrder;
 @Repository
 public interface WorkOrderRepo extends MongoRepository<WorkOrder, ObjectId>
 {
-    List<WorkOrder> findByTechAssignedAndDate(String tech, LocalDate date);
+    List<WorkOrder> findByTechAssignedAndDate(String tech, LocalDateTime date);
 
     List<WorkOrder> findByTechAssigned(String tech);
 

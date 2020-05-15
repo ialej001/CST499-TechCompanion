@@ -3,6 +3,7 @@ package server.tech_companion.controller;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import javax.validation.Valid;
@@ -30,7 +31,7 @@ public class TCRestController {
     // get all for one tech on a date
     @GetMapping("/{tech}/{date}")
     public ResponseEntity<List<WorkOrder>> fetchAllForTechOnDate(@PathVariable String tech,
-            @PathVariable LocalDate date) {
+            @PathVariable LocalDateTime date) {
         List<WorkOrder> workOrders = workOrderService.fetchAllForTechOnDate(tech, date);
         if (workOrders.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -90,17 +91,17 @@ public class TCRestController {
         }
     }
 
-    // complete work order from tech
-    @PutMapping("/complete/{id}")
-    public ResponseEntity<WorkOrder> completeWorkOrder(@PathVariable String id, @Valid @RequestBody WorkOrder json) {
-        // System.out.println(json.toString());
-        WorkOrder updatedWorkOrder = workOrderService.completeWorkOrder(json);
-        if (updatedWorkOrder == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(updatedWorkOrder);
-        }
-    }
+//    // complete work order from tech
+//    @PutMapping("/complete/{id}")
+//    public ResponseEntity<WorkOrder> completeWorkOrder(@PathVariable String id, @Valid @RequestBody WorkOrder json) {
+//        // System.out.println(json.toString());
+//        WorkOrder updatedWorkOrder = workOrderService.completeWorkOrder(json);
+//        if (updatedWorkOrder == null) {
+//            return ResponseEntity.notFound().build();
+//        } else {
+//            return ResponseEntity.ok(updatedWorkOrder);
+//        }
+//    }
 
     // delete one work order
     @DeleteMapping("/work-order/{id}")

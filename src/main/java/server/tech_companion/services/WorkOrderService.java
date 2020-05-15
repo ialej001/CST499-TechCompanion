@@ -2,6 +2,7 @@ package server.tech_companion.services;
 
 import java.beans.PropertyDescriptor;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,6 +20,7 @@ import io.leangen.graphql.annotations.GraphQLQuery;
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi;
 import server.tech_companion.models.Customer;
 import server.tech_companion.models.DispatchHelper;
+import server.tech_companion.models.Issue;
 import server.tech_companion.models.Part;
 import server.tech_companion.models.SafetyChecklist;
 import server.tech_companion.models.WorkOrder;
@@ -43,7 +45,7 @@ public class WorkOrderService {
     }
 
     // get all for one tech on a date
-    public List<WorkOrder> fetchAllForTechOnDate(String tech, LocalDate date) {
+    public List<WorkOrder> fetchAllForTechOnDate(String tech, LocalDateTime date) {
         return workOrderRepo.findByTechAssignedAndDate(tech, date);
     }
 
@@ -92,6 +94,7 @@ public class WorkOrderService {
         }
 
         workOrder.setIsCompleted(false);
+        workOrder.setDate(LocalDateTime.now());
         workOrderRepo.save(workOrder);
         customerService.upsertCustomer(customer);
 
@@ -114,12 +117,19 @@ public class WorkOrderService {
 
     // update workorder from tech
     @GraphQLMutation(name = "completeWorkOrder")
-    public WorkOrder completeWorkOrder(@GraphQLArgument(name = "workOrder") WorkOrder json) {
-        WorkOrder workOrder = workOrderRepo.findBy_id(new ObjectId(json.getString_id()));
-        copyNonNullProperties(json, workOrder);
+    public WorkOrder completeWorkOrder(
+    		@GraphQLArgument(name = "string_id") String id,
+    		@GraphQLArgument(name = "issues") List<Issue> issues,
+    		@GraphQLArgument(name = "partsUsed") List<Part> partsUsed,
+    		@GraphQLArgument(name = "timeStarted") String timeStarted,
+    		@GraphQLArgument(name = "timeEnded") LocalDateTime timeEnded) {
+        WorkOrder workOrder = workOrderRepo.findBy_id(new ObjectId(id));
+        workOrder.setPartsUsed(partsUsed);
+        workOrder.setIssues(issues);
+        workOrder.setTimeStarted(LocalDateTime.parse(timeStarted));
+        workOrder.setTimeEnded(timeEnded);
 
         workOrderRepo.save(workOrder);
-        customerService.upsertCustomer(json.getCustomer());
         return workOrder;
     }
 

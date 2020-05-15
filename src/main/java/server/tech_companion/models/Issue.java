@@ -8,4 +8,5 @@ import lombok.Data;
 public class Issue {
     private String location;
     private String problem;
+    private String resolution;
 }

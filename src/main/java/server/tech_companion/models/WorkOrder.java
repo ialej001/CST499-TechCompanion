@@ -1,12 +1,10 @@
 package server.tech_companion.models;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,11 +39,11 @@ public class WorkOrder {
     @GraphQLQuery(name = "partsUsed", description = "optional")
     private List<Part> partsUsed;
     @GraphQLQuery(name = "timeStarted", description = "optional")
-    private LocalTime timeStarted;
+    private LocalDateTime timeStarted;
     @GraphQLQuery(name = "timeEnded", description = "optional")
-    private LocalTime timeEnded;
+    private LocalDateTime timeEnded;
     @GraphQLQuery(name = "dateDispatched", description = "optional")
-    private LocalDate date;
+    private LocalDateTime date;
 }
 
 

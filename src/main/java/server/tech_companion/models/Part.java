@@ -24,6 +24,7 @@ public class Part {
     private String name;
     @GraphQLQuery(name = "price")
     private Double price;
+    @GraphQLQuery(name = "quantity")
     private Integer quantity;
 
     @Override

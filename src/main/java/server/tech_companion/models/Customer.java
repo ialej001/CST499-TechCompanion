@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 public class Customer {
     @Id
     private ObjectId _id;
+    private String string_id;
     private LocalDateTime createdAt;
 
     // property info
@@ -76,5 +77,7 @@ public class Customer {
 
     @GraphQLQuery(name = "isMasterSlave", description = "A person's name")
     private List<Boolean> isMasterSlave;
+    
+    private List<GateDetails> gateDetails;
     
 }

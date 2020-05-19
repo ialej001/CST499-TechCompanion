@@ -103,13 +103,18 @@ public class WorkOrderService {
 
     // update one work order from office (typos, missing info)
     public WorkOrder updateWorkOrderFromOffice(String id, WorkOrder json) {
+    	System.out.println(id);
         WorkOrder workOrder = workOrderRepo.findBy_id(new ObjectId(id));
+        System.out.println(json);
+        
         copyNonNullProperties(json, workOrder);
 
         Customer customer = json.getCustomer();
         String serviceAddress = customer.getStreetAddress() + " " + customer.getCity() + ", CA "
                 + customer.getZipCode();
         workOrder.getCustomer().setServiceAddress(serviceAddress);
+        customerService.upsertCustomer(workOrder.getCustomer());
+        System.out.println(workOrder);
         workOrderRepo.save(workOrder);
 
         return workOrder;
@@ -118,16 +123,14 @@ public class WorkOrderService {
     // update workorder from tech
     @GraphQLMutation(name = "completeWorkOrder")
     public WorkOrder completeWorkOrder(
-    		@GraphQLArgument(name = "string_id") String id,
-    		@GraphQLArgument(name = "issues") List<Issue> issues,
-    		@GraphQLArgument(name = "partsUsed") List<Part> partsUsed,
-    		@GraphQLArgument(name = "timeStarted") String timeStarted,
-    		@GraphQLArgument(name = "timeEnded") LocalDateTime timeEnded) {
+    		String id, 
+    		WorkOrder body) {
+    	System.out.println(body.getIssues());
         WorkOrder workOrder = workOrderRepo.findBy_id(new ObjectId(id));
-        workOrder.setPartsUsed(partsUsed);
-        workOrder.setIssues(issues);
-        workOrder.setTimeStarted(LocalDateTime.parse(timeStarted));
-        workOrder.setTimeEnded(timeEnded);
+        workOrder.setPartsUsed(body.getPartsUsed());
+        workOrder.setIssues(body.getIssues());
+        workOrder.setTimeStarted(body.getTimeStarted());
+        workOrder.setTimeEnded(body.getTimeEnded());
 
         workOrderRepo.save(workOrder);
         return workOrder;

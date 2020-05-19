@@ -15,6 +15,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.bind.annotation.*;
 import server.tech_companion.models.Customer;
 import server.tech_companion.models.DispatchHelper;
+import server.tech_companion.models.Issue;
+import server.tech_companion.models.Part;
 import server.tech_companion.models.WorkOrder;
 import server.tech_companion.services.CustomerService;
 import server.tech_companion.services.WorkOrderService;
@@ -63,6 +65,17 @@ public class TCRestController {
         }
     }
 
+    // get incomplete
+    @GetMapping("/incomplete")
+    public ResponseEntity<List<WorkOrder>> fetchIncomplete() {
+    	List<WorkOrder> workOrders = workOrderService.fetchIncompleteWO(false);
+    	if (workOrders.isEmpty()) {
+    		return ResponseEntity.notFound().build();
+    	} else {
+    		return ResponseEntity.ok(workOrders);
+    	}
+    }
+    
     // create work order - working 4/29
     @PostMapping("/dispatch/work-order")
     public ResponseEntity<WorkOrder> dispatchWorkOrder(@Valid @RequestBody DispatchHelper json)
@@ -91,17 +104,18 @@ public class TCRestController {
         }
     }
 
-//    // complete work order from tech
-//    @PutMapping("/complete/{id}")
-//    public ResponseEntity<WorkOrder> completeWorkOrder(@PathVariable String id, @Valid @RequestBody WorkOrder json) {
-//        // System.out.println(json.toString());
-//        WorkOrder updatedWorkOrder = workOrderService.completeWorkOrder(json);
-//        if (updatedWorkOrder == null) {
-//            return ResponseEntity.notFound().build();
-//        } else {
-//            return ResponseEntity.ok(updatedWorkOrder);
-//        }
-//    }
+    // complete work order from tech
+    @PutMapping("/complete/{id}")
+    public ResponseEntity<WorkOrder> completeWorkOrder(
+    		@PathVariable String id, 
+    		@Valid @RequestBody WorkOrder body) {
+        WorkOrder updatedWorkOrder = workOrderService.completeWorkOrder(id, body);
+        if (updatedWorkOrder == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(updatedWorkOrder);
+        }
+    }
 
     // delete one work order
     @DeleteMapping("/work-order/{id}")
@@ -117,9 +131,35 @@ public class TCRestController {
     // find a customer
     @PostMapping("/findCustomer")
     public ResponseEntity<List<Customer>> findCustomer(@Valid @RequestBody Map<String, String> addressInfo) {
-        System.out.println(addressInfo);
         List<Customer> customers = customerService.fetchCustomerByStreetAddress(addressInfo.get("streetAddress"));
-        System.out.println(customers);
         return ResponseEntity.ok(customers);
     } 
+    
+    @GetMapping("/customers")
+    public ResponseEntity<List<Customer>> findCustomers() {
+    	List<Customer> customers = customerService.getCustomers();
+        if (customers.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(customers);
+        }
+    }
+    
+    @PutMapping("/customer/{id}")
+    public ResponseEntity<Customer> updateCustomer(@PathVariable String id, @RequestBody Customer customer) {
+    	Customer updatedCustomer = customerService.upsertCustomer(customer);
+        if (updatedCustomer == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(updatedCustomer);
+        }
+    }
+    
+    @DeleteMapping("/customer/{id}")
+    public ResponseEntity<?> deleteCustomer(@PathVariable String id) {
+    	System.out.println(id.getClass());
+    	System.out.println(id);
+        customerService.deleteCustomer(new ObjectId(id));
+        return ResponseEntity.noContent().build();
+    }
 }

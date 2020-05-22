@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import lombok.AllArgsConstructor;
 import server.tech_companion.models.Customer;
+import server.tech_companion.models.GateDetails;
 import server.tech_companion.models.SafetyChecklist;
 import server.tech_companion.repositories.SafetyChecklistRepository;
 
@@ -31,16 +32,19 @@ public class SafetyChecklistService {
 
     public List<SafetyChecklist> initializeLists(Customer customer) {
         List<SafetyChecklist> lists = new ArrayList<>();
-        List<String> gateLocations = customer.getGateLocations();
+        List<GateDetails> gateDetails = customer.getGateDetails();
 
-        for (int i = 0; i < gateLocations.size(); i++) {
+        for (GateDetails gateDetail : gateDetails) {
             SafetyChecklist newChecklist = new SafetyChecklist();
             newChecklist.set_id(ObjectId.get());
             String serviceAddress = customer.getStreetAddress() + " " + customer.getCity() + ", CA"
                     + customer.getZipCode();
 
-            newChecklist.setLocationOfGate(gateLocations.get(i));
+            newChecklist.setLocationOfGate(gateDetail.getLocation());
             newChecklist.setServiceAddress(serviceAddress);
+            
+            // TODO: SET OPERATOR DETAILS
+            
             // newChecklist.setTypeOfGate(customer.getGateType().get(i));
             // newChecklist.setOperatorModel(customer.getOperatorModel().get(i));
             lists.add(newChecklist);

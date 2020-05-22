@@ -19,9 +19,11 @@ import server.tech_companion.models.Issue;
 import server.tech_companion.models.Part;
 import server.tech_companion.models.WorkOrder;
 import server.tech_companion.services.CustomerService;
+import server.tech_companion.services.PartsService;
 import server.tech_companion.services.WorkOrderService;
 
-@CrossOrigin(origins = { "http://localhost:9080", "http://localhost:8080" })
+//@CrossOrigin(origins = { "http://localhost:9080", "http://localhost:8080" })
+@CrossOrigin
 @RestController
 @RequestMapping("/api")
 public class TCRestController {
@@ -29,6 +31,8 @@ public class TCRestController {
     private WorkOrderService workOrderService;
     @Autowired
     private CustomerService customerService;
+    @Autowired
+    private PartsService partsService;
 
     // get all for one tech on a date
     @GetMapping("/{tech}/{date}")
@@ -76,6 +80,16 @@ public class TCRestController {
     	}
     }
     
+    // get complete
+    @GetMapping("/complete")
+    public ResponseEntity<List<WorkOrder>> fetchComplete() {
+    	List<WorkOrder> workOrders = workOrderService.fetchIncompleteWO(true);
+    	if (workOrders.isEmpty()) {
+    		return ResponseEntity.notFound().build();
+    	} else {
+    		return ResponseEntity.ok(workOrders);
+    	}
+    }
     // create work order - working 4/29
     @PostMapping("/dispatch/work-order")
     public ResponseEntity<WorkOrder> dispatchWorkOrder(@Valid @RequestBody DispatchHelper json)
@@ -145,6 +159,19 @@ public class TCRestController {
         }
     }
     
+    @PostMapping("/customer/new")
+    public ResponseEntity<Customer> createCustomer(@RequestBody Customer json) {
+        Customer customer = customerService.upsertCustomer(json);
+        if (customer == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/customer/new")
+                    .buildAndExpand(customer.get_id()).toUri();
+
+            return ResponseEntity.created(uri).body(customer);
+        }
+    }
+    
     @PutMapping("/customer/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable String id, @RequestBody Customer customer) {
     	Customer updatedCustomer = customerService.upsertCustomer(customer);
@@ -161,5 +188,15 @@ public class TCRestController {
     	System.out.println(id);
         customerService.deleteCustomer(new ObjectId(id));
         return ResponseEntity.noContent().build();
+    }
+    
+    @GetMapping("/parts/all")
+    public ResponseEntity<List<Part>> findAllParts() {
+    	List<Part> parts = partsService.getParts();
+        if (parts.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(parts);
+        }
     }
 }

@@ -131,6 +131,7 @@ public class WorkOrderService {
         workOrder.setIssues(body.getIssues());
         workOrder.setTimeStarted(body.getTimeStarted());
         workOrder.setTimeEnded(body.getTimeEnded());
+        workOrder.setIsCompleted(true);
 
         workOrderRepo.save(workOrder);
         return workOrder;

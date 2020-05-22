@@ -41,6 +41,7 @@ public class CustomerService {
     }
 
     public Customer upsertCustomer(Customer customer) {
+    	System.out.println(customer);
         if (customer.get_id() == null) {
         	copyNonNullProperties(new Customer(), customer);
         	ObjectId newId = ObjectId.get();

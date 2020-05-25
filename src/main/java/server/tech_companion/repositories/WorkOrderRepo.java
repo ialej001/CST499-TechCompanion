@@ -1,18 +1,15 @@
 package server.tech_companion.repositories;
 
-import java.time.LocalDateTime;
 import java.util.List;
-
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
-
 import server.tech_companion.models.WorkOrder;
 
 @Repository
 public interface WorkOrderRepo extends MongoRepository<WorkOrder, ObjectId>
 {
-    List<WorkOrder> findByTechAssignedAndDate(String tech, LocalDateTime date);
+    List<WorkOrder> findByTechAssignedAndIsCompleted(String tech, Boolean IsCompleted);
 
     List<WorkOrder> findByTechAssigned(String tech);
 

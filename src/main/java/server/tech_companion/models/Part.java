@@ -3,7 +3,6 @@ package server.tech_companion.models;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import io.leangen.graphql.annotations.GraphQLQuery;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,19 +16,15 @@ import lombok.NoArgsConstructor;
 public class Part {
     @Id
     private ObjectId _id;
-    @GraphQLQuery(name = "partNumber")
+    private String string_id;
     private String partNumber;
-    @GraphQLQuery(name = "description")
     private String description;
     private String name;
-    @GraphQLQuery(name = "price")
     private Double price;
-    @GraphQLQuery(name = "quantity")
-    private Integer quantity;
 
     @Override
     public String toString() {
         return "Part [_id=" + _id + ", description=" + description + ", name=" + name + ", partNumber=" + partNumber
-                + ", price=" + price + ", quantity=" + quantity + "]";
+                + ", price=" + price + "]";
     }
 }

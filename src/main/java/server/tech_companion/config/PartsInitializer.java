@@ -44,6 +44,7 @@ public class PartsInitializer {
 					if (nextRecord[1].contains("Part")) {
 						System.out.println(nextRecord[0] + " Part [part#: " + nextRecord[2] + ", description: " + nextRecord[3] + ", price: " + nextRecord[6]);
 						part.set_id(ObjectId.get());
+						part.setString_id(part.get_id().toString());
 						part.setDescription(nextRecord[3]);
 						part.setPartNumber(nextRecord[2]);
 						part.setPrice(Double.parseDouble(nextRecord[6]));

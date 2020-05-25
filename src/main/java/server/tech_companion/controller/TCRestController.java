@@ -2,7 +2,6 @@ package server.tech_companion.controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -13,14 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.bind.annotation.*;
-import server.tech_companion.models.Customer;
-import server.tech_companion.models.DispatchHelper;
-import server.tech_companion.models.Issue;
-import server.tech_companion.models.Part;
+
 import server.tech_companion.models.WorkOrder;
-import server.tech_companion.services.CustomerService;
-import server.tech_companion.services.PartsService;
-import server.tech_companion.services.WorkOrderService;
+import server.tech_companion.models.Json.*;
+import server.tech_companion.services.*;
 
 //@CrossOrigin(origins = { "http://localhost:9080", "http://localhost:8080" })
 @CrossOrigin
@@ -34,11 +29,15 @@ public class TCRestController {
     @Autowired
     private PartsService partsService;
 
-    // get all for one tech on a date
-    @GetMapping("/{tech}/{date}")
+    /*#####################################
+     * Dispatch end points                #
+     #####################################*/
+    
+    // get all for one tech on a date (TODO: rework when authentication is added)
+    @GetMapping("/{tech}/")
     public ResponseEntity<List<WorkOrder>> fetchAllForTechOnDate(@PathVariable String tech,
             @PathVariable LocalDateTime date) {
-        List<WorkOrder> workOrders = workOrderService.fetchAllForTechOnDate(tech, date);
+        List<WorkOrder> workOrders = workOrderService.fetchAllIncompleteForTech(tech);
         if (workOrders.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
@@ -47,7 +46,7 @@ public class TCRestController {
 
     }
 
-    // get all for one tech
+    // get all for one tech (TODO: likely remove)
     @GetMapping("/{tech}")
     public ResponseEntity<List<WorkOrder>> fetchAllForTech(@PathVariable String tech) {
         List<WorkOrder> workOrders = workOrderService.fetchAllForTech(tech);
@@ -58,21 +57,21 @@ public class TCRestController {
         }
     }
 
-    // get all
-    @GetMapping("/all")
-    public ResponseEntity<List<WorkOrder>> fetchAll() {
-        List<WorkOrder> workOrders = workOrderService.fetchAll();
-        if (workOrders.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(workOrders);
-        }
-    }
+    // get all 
+//    @GetMapping("/all")
+//    public ResponseEntity<List<WorkOrder>> fetchAll() {
+//        List<WorkOrder> workOrders = workOrderService.fetchAll();
+//        if (workOrders.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        } else {
+//            return ResponseEntity.ok(workOrders);
+//        }
+//    }
 
     // get incomplete
     @GetMapping("/incomplete")
-    public ResponseEntity<List<WorkOrder>> fetchIncomplete() {
-    	List<WorkOrder> workOrders = workOrderService.fetchIncompleteWO(false);
+    public ResponseEntity<List<DispatchJson>> fetchIncomplete() {
+    	List<DispatchJson> workOrders = workOrderService.fetchIncompleteWO();
     	if (workOrders.isEmpty()) {
     		return ResponseEntity.notFound().build();
     	} else {
@@ -82,25 +81,26 @@ public class TCRestController {
     
     // get complete
     @GetMapping("/complete")
-    public ResponseEntity<List<WorkOrder>> fetchComplete() {
-    	List<WorkOrder> workOrders = workOrderService.fetchIncompleteWO(true);
+    public ResponseEntity<List<HistoryJson>> fetchComplete() {
+    	List<HistoryJson> workOrders = workOrderService.fetchCompleteWO();
     	if (workOrders.isEmpty()) {
     		return ResponseEntity.notFound().build();
     	} else {
     		return ResponseEntity.ok(workOrders);
     	}
     }
+    
     // create work order - working 4/29
     @PostMapping("/dispatch/work-order")
-    public ResponseEntity<WorkOrder> dispatchWorkOrder(@Valid @RequestBody DispatchHelper json)
+    public ResponseEntity<DispatchJson> dispatchWorkOrder(@Valid @RequestBody DispatchJson json)
             throws URISyntaxException {
 
-        WorkOrder workOrder = workOrderService.dispatchWorkOrder(json);
+        DispatchJson workOrder = workOrderService.dispatchWorkOrder(json);
         if (workOrder == null) {
             return ResponseEntity.notFound().build();
         } else {
             URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/dispatch/work-order")
-                    .buildAndExpand(workOrder.get_id()).toUri();
+                    .buildAndExpand(workOrder.getWorkOrder_id()).toUri();
 
             return ResponseEntity.created(uri).body(workOrder);
         }
@@ -108,9 +108,9 @@ public class TCRestController {
 
     // update one work order
     @PutMapping("/update/{id}")
-    public ResponseEntity<WorkOrder> updateWorkOrderFromOffice(@PathVariable String id,
-            @Valid @RequestBody WorkOrder json) {
-        WorkOrder updatedWorkOrder = workOrderService.updateWorkOrderFromOffice(id, json);
+    public ResponseEntity<DispatchJson> updateWorkOrderFromOffice(@PathVariable String id,
+            @Valid @RequestBody DispatchJson json) {
+    	DispatchJson updatedWorkOrder = workOrderService.updateWorkOrderFromOffice(id, json);
         if (updatedWorkOrder == null) {
             return ResponseEntity.notFound().build();
         } else {
@@ -138,20 +138,21 @@ public class TCRestController {
         return ResponseEntity.noContent().build();
     }
 
-    /************
-     ** Customers**
-     *************/
+    /***************
+     ** Customers **
+     **************/
 
     // find a customer
     @PostMapping("/findCustomer")
-    public ResponseEntity<List<Customer>> findCustomer(@Valid @RequestBody Map<String, String> addressInfo) {
-        List<Customer> customers = customerService.fetchCustomerByStreetAddress(addressInfo.get("streetAddress"));
+    public ResponseEntity<List<CustomerJson>> findCustomer(@Valid @RequestBody Map<String, String> addressInfo) {
+        List<CustomerJson> customers = customerService.fetchCustomerByStreetAddress(addressInfo.get("streetAddress"));
         return ResponseEntity.ok(customers);
     } 
     
+    // find all customers
     @GetMapping("/customers")
-    public ResponseEntity<List<Customer>> findCustomers() {
-    	List<Customer> customers = customerService.getCustomers();
+    public ResponseEntity<List<CustomerJson>> findCustomers() {
+    	List<CustomerJson> customers = customerService.getCustomers();
         if (customers.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
@@ -159,22 +160,24 @@ public class TCRestController {
         }
     }
     
+    // create a customer
     @PostMapping("/customer/new")
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer json) {
-        Customer customer = customerService.upsertCustomer(json);
+    public ResponseEntity<CustomerJson> createCustomer(@RequestBody CustomerJson json) {
+    	CustomerJson customer = customerService.upsertCustomer(json);
         if (customer == null) {
             return ResponseEntity.notFound().build();
         } else {
             URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/customer/new")
-                    .buildAndExpand(customer.get_id()).toUri();
+                    .buildAndExpand(customer.getString_id()).toUri();
 
             return ResponseEntity.created(uri).body(customer);
         }
     }
     
+    // update one customer
     @PutMapping("/customer/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable String id, @RequestBody Customer customer) {
-    	Customer updatedCustomer = customerService.upsertCustomer(customer);
+    public ResponseEntity<CustomerJson> updateCustomer(@PathVariable String id, @RequestBody CustomerJson customer) {
+    	CustomerJson updatedCustomer = customerService.upsertCustomer(customer);
         if (updatedCustomer == null) {
             return ResponseEntity.notFound().build();
         } else {
@@ -182,6 +185,7 @@ public class TCRestController {
         }
     }
     
+    // remove one customer
     @DeleteMapping("/customer/{id}")
     public ResponseEntity<?> deleteCustomer(@PathVariable String id) {
     	System.out.println(id.getClass());
@@ -190,13 +194,34 @@ public class TCRestController {
         return ResponseEntity.noContent().build();
     }
     
+    /*###################
+     * Inventory(Parts) #
+     ##################*/
+    
+    // get all items
     @GetMapping("/parts/all")
-    public ResponseEntity<List<Part>> findAllParts() {
-    	List<Part> parts = partsService.getParts();
+    public ResponseEntity<List<PartJson>> findAllParts() {
+    	List<PartJson> parts = partsService.getParts();
         if (parts.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
             return ResponseEntity.ok(parts);
         }
+    }
+    
+    @PutMapping("/parts/update/{id}")
+    public ResponseEntity<PartJson> updatePart(@PathVariable String id, @RequestBody PartJson part) {
+    	PartJson updatedPart = partsService.updatePart(part);
+        if (updatedPart == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(updatedPart);
+        }
+    }
+    
+    @DeleteMapping("/parts/delete/{id}")
+    public ResponseEntity<?> deletePart(@PathVariable String id) {
+    	partsService.deletePart(new ObjectId(id));
+    	return ResponseEntity.noContent().build();
     }
 }

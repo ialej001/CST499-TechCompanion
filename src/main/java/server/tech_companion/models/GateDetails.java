@@ -13,4 +13,5 @@ public class GateDetails {
 	private String gateType1;
 	private String gateType2;
 	private Boolean isMasterSlave;
+	private String safetyChecklistID;
 }

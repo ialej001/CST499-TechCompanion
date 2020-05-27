@@ -1,5 +1,6 @@
 package server.tech_companion.services;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,6 @@ public class CustomerService {
     }
 
     public CustomerJson fetchCustomerByString_id(String id) {
-    	System.out.println(id);
         Customer customerInDb = customerRepo.findBy_id(new ObjectId(id));
         CustomerJson json = new CustomerJson();
         CommonMethods.copyNonNullProperties(customerInDb, json);
@@ -52,6 +52,7 @@ public class CustomerService {
         	newCustomer.setString_id(newId.toString());
         	newCustomer.setServiceAddress(json.getStreetAddress() + " " +
         			json.getCity() + ", CA " + json.getZipCode());
+        	newCustomer.setCreatedAt(LocalDateTime.now());
             customerRepo.save(newCustomer);
             
             json.setString_id(newCustomer.getString_id());

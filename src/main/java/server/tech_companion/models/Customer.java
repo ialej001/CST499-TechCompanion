@@ -42,6 +42,8 @@ public class Customer {
     private String contactPhone;
     private String contactEmail;
     private String billingMethod;
+    private Double laborRate;
+    private Double taxRate;
 
     // gate details
     private List<GateDetails> gateDetails;

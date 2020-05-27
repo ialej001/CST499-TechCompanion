@@ -14,7 +14,7 @@ import server.tech_companion.models.Issue;
 @Data
 @Builder
 public class DispatchJson {
-	private String workOrder_id;
+	private String string_id;
     private CustomerJson customer;
     private String callType;
     private List<Issue> issues;

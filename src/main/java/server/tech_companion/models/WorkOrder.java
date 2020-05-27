@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import server.tech_companion.models.Json.CustomerJson;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,7 +37,25 @@ public class WorkOrder {
     private Double subTotal;
     private Double total;
     private Double labor;
-    private Double taxRate;
+    private Double tax;
+    
+    public static Double getLaborCharges(CustomerJson customer, Double timeElapsed) {
+    	// most calls are under an hour, so return if less than 1 hour
+        if (timeElapsed <= 60) 
+        	return customer.getLaborRate();
+        else {
+        	// if we go over, then pro rate every half hour past the full hour
+        	timeElapsed -= 60;
+        	Double halfHourBlocks = 2 + (timeElapsed / 30);
+        	// check for remainder. if we have any remainder amount, add another block
+        	if (timeElapsed % 30 > 0) {
+        		halfHourBlocks++;
+        	}
+        	
+        	// set our labor charge
+        	return (customer.getLaborRate() * (halfHourBlocks / 2));
+        }
+    }
 }
 
 

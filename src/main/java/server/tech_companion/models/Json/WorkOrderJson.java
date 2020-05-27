@@ -15,7 +15,7 @@ import server.tech_companion.models.SafetyChecklist;
 @Data
 @Builder
 public class WorkOrderJson {
-    private String string_id;
+    private String stringId;
     private Boolean isCompleted;
 
     private CustomerJson customer;
@@ -33,7 +33,7 @@ public class WorkOrderJson {
     private Double subTotal;
     private Double total;
     private Double labor;
-    private Double taxRate;
+    private Double tax;
 }
 
 

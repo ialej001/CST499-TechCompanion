@@ -29,7 +29,7 @@ public class HistoryJson {
     private Double subTotal;
     private Double total;
     private Double labor;
-    private Double taxRate;
+    private Double tax;
     
 //    public static List<HistoryJson> createJsonList(List<WorkOrder> workOrdersInDb, List<CustomerJson> customers) {
 //        

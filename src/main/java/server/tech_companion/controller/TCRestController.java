@@ -2,7 +2,6 @@ package server.tech_companion.controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import javax.validation.Valid;
@@ -34,10 +33,11 @@ public class TCRestController {
      #####################################*/
     
     // get all for one tech on a date (TODO: rework when authentication is added)
-    @GetMapping("/{tech}/")
-    public ResponseEntity<List<WorkOrder>> fetchAllForTechOnDate(@PathVariable String tech,
-            @PathVariable LocalDateTime date) {
-        List<WorkOrder> workOrders = workOrderService.fetchAllIncompleteForTech(tech);
+    @GetMapping("/incomplete/{tech}")
+    public ResponseEntity<List<WorkOrderJson>> fetchAllIncompleteForTech(@PathVariable String tech) {
+        List<WorkOrderJson> workOrders = workOrderService.fetchAllIncompleteForTech(tech);
+        System.out.println("Sending tech this:");
+        System.out.println(workOrders);
         if (workOrders.isEmpty()) {
             return ResponseEntity.notFound().build();
         } else {
@@ -56,17 +56,6 @@ public class TCRestController {
             return ResponseEntity.ok(workOrders);
         }
     }
-
-    // get all 
-//    @GetMapping("/all")
-//    public ResponseEntity<List<WorkOrder>> fetchAll() {
-//        List<WorkOrder> workOrders = workOrderService.fetchAll();
-//        if (workOrders.isEmpty()) {
-//            return ResponseEntity.notFound().build();
-//        } else {
-//            return ResponseEntity.ok(workOrders);
-//        }
-//    }
 
     // get incomplete
     @GetMapping("/incomplete")
@@ -100,7 +89,7 @@ public class TCRestController {
             return ResponseEntity.notFound().build();
         } else {
             URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/dispatch/work-order")
-                    .buildAndExpand(workOrder.getWorkOrder_id()).toUri();
+                    .buildAndExpand(workOrder.getString_id()).toUri();
 
             return ResponseEntity.created(uri).body(workOrder);
         }
@@ -120,10 +109,11 @@ public class TCRestController {
 
     // complete work order from tech
     @PutMapping("/complete/{id}")
-    public ResponseEntity<WorkOrder> completeWorkOrder(
+    public ResponseEntity<WorkOrderJson> completeWorkOrder(
     		@PathVariable String id, 
-    		@Valid @RequestBody WorkOrder body) {
-        WorkOrder updatedWorkOrder = workOrderService.completeWorkOrder(id, body);
+    		@Valid @RequestBody WorkOrderJson body) {
+    	System.out.println(body);
+        WorkOrderJson updatedWorkOrder = workOrderService.completeWorkOrder(id, body);
         if (updatedWorkOrder == null) {
             return ResponseEntity.notFound().build();
         } else {

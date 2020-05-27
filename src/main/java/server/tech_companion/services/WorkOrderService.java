@@ -1,5 +1,6 @@
 package server.tech_companion.services;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +32,20 @@ public class WorkOrderService {
     }
 
     // get all for one tech on a date
-    public List<WorkOrder> fetchAllIncompleteForTech(String tech) {
-        return workOrderRepo.findByTechAssignedAndIsCompleted(tech, false);
+    public List<WorkOrderJson> fetchAllIncompleteForTech(String tech) {
+    	// TODO: CHANGE THE WORKORDER REPO CALL TO INCLUDE TECH WHEN THAT CHANGE IS MADE
+        List<WorkOrder> workOrders = workOrderRepo.findByIsCompleted(false);
+        List<WorkOrderJson> workOrderJson = new ArrayList<WorkOrderJson>();
+        
+        for(WorkOrder workOrder : workOrders) {
+        	WorkOrderJson json = new WorkOrderJson();
+        	CommonMethods.copyNonNullProperties(workOrder, json);
+        	json.setStringId(workOrder.getString_id());
+        	json.setCustomer(customerService.fetchCustomerByString_id(workOrder.getCustomer_id()));
+        	workOrderJson.add(json);
+        }
+        
+        return workOrderJson;
     }
 
     // get all completed
@@ -45,6 +58,7 @@ public class WorkOrderService {
         	CustomerJson customerJson = customerService.fetchCustomerByString_id(workOrder.getCustomer_id());
         	json.setCustomer(customerJson);
         	customersJson.add(json);
+        	System.out.println(json);
         }
         return customersJson;
     }
@@ -89,7 +103,7 @@ public class WorkOrderService {
         workOrder.setDispatched(LocalDateTime.now());
         workOrderRepo.save(workOrder);
         
-        json.setWorkOrder_id(workOrder.getString_id());
+        json.setString_id(workOrder.getString_id());
         json.setDispatched(workOrder.getDispatched());
         return json;
     }
@@ -97,7 +111,7 @@ public class WorkOrderService {
     // update one work order from office (typos, missing info)
     public DispatchJson updateWorkOrderFromOffice(String id, DispatchJson json) {
     	System.out.println(id);
-        WorkOrder workOrder = workOrderRepo.findBy_id(new ObjectId(json.getWorkOrder_id()));
+        WorkOrder workOrder = workOrderRepo.findBy_id(new ObjectId(json.getString_id()));
         System.out.println(json);
         
         CommonMethods.copyNonNullProperties(json, workOrder);
@@ -110,20 +124,46 @@ public class WorkOrderService {
         return json;
     }
 
-    // update workorder from tech
-    public WorkOrder completeWorkOrder(
+    // complete workorder from tech
+    public WorkOrderJson completeWorkOrder(
     		String id, 
-    		WorkOrder body) {
-    	System.out.println(body.getIssues());
+    		WorkOrderJson json) {
+    	System.out.println("inside completeWO");
+    	System.out.println(json);
         WorkOrder workOrder = workOrderRepo.findBy_id(new ObjectId(id));
-        workOrder.setPartsUsed(body.getPartsUsed());
-        workOrder.setIssues(body.getIssues());
-        workOrder.setTimeStarted(body.getTimeStarted());
-        workOrder.setTimeEnded(body.getTimeEnded());
+        workOrder.setPartsUsed(json.getPartsUsed());
+        workOrder.setIssues(json.getIssues());
+        workOrder.setTimeStarted(json.getTimeStarted());
+        workOrder.setTimeEnded(json.getTimeEnded());
         workOrder.setIsCompleted(true);
+        
+        // calculate charges
+        // get time spent in minutes
+        
+        Duration duration = Duration.between(json.getTimeStarted(), json.getTimeEnded());
+        // duration to minutes results in long primitive
+        Double timeElapsed = (double) Math.abs(duration.toMinutes()); 
+        
+        Double labor, subTotal, tax;
+        labor = WorkOrder.getLaborCharges(json.getCustomer(), timeElapsed);
+        workOrder.setLabor(labor);
+        
+        subTotal = Part.getSubtotal(json.getPartsUsed());
+        workOrder.setSubTotal(subTotal);
+        
+        // tax rate is inputed as double percentage (ie 9.75%, not 0.0975)
+        // also protect against flat rates (9% --> 9.0%)
+        if (subTotal == 0.0) {
+        	workOrder.setTax(0.0);
+        	workOrder.setTotal(labor + subTotal);
+        } else {
+	        tax = workOrder.getSubTotal() * (json.getCustomer().getTaxRate() / 100.0);
+	        workOrder.setTax(tax);
+	        workOrder.setTotal(labor + subTotal + tax);
+        }
 
         workOrderRepo.save(workOrder);
-        return workOrder;
+        return json;
     }
 
     // parts database access

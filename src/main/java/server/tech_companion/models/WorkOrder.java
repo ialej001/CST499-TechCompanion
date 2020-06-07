@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import server.tech_companion.models.Json.CustomerJson;
+import server.tech_companion.payload.CustomerJson;
 
 @NoArgsConstructor
 @AllArgsConstructor

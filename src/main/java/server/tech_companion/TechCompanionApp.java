@@ -10,3 +10,4 @@ public class TechCompanionApp {
 		SpringApplication.run(TechCompanionApp.class, args);
 	}
 }
+

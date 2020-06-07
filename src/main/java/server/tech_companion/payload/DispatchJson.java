@@ -1,4 +1,4 @@
-package server.tech_companion.models.Json;
+package server.tech_companion.payload;
 
 import java.time.LocalDateTime;
 import java.util.List;

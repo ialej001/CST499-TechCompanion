@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -13,13 +14,19 @@ import org.springframework.stereotype.Component;
 
 import com.opencsv.CSVReader;
 
+import server.tech_companion.models.ERole;
 import server.tech_companion.models.Part;
+import server.tech_companion.models.Role;
+import server.tech_companion.models.User;
 import server.tech_companion.repositories.PartsRepository;
+import server.tech_companion.repositories.UserRepository;
 
 @Component
 public class PartsInitializer {
 	@Autowired
 	private PartsRepository partsRepo;
+	@Autowired
+	private UserRepository userRepo;
 	private String file;
 	private Reader reader;
 	private CSVReader csvReader;
@@ -56,9 +63,29 @@ public class PartsInitializer {
 				}
 			}
 		} finally {
-			System.out.println("Done seeding.");
+			System.out.println("Parts loaded.");
 		}
 	}
+	
+//	@PostConstruct
+//	public void seedAdminAccount() throws IOException {
+//		try {
+//			if (userRepo.findAll().isEmpty()) {
+//				Set<Role> roles = new Set<Role>();
+//				User user = new User(
+//						ObjectId.get(), 
+//						"Monica", 
+//						"password", 
+//						"mx_alejandre1@yahoo.com", 
+//						roles);
+//			}
+//		} finally {
+//			System.out.println("Admin present");
+//		}
+////		} catch(IOException e) {
+////			
+////		}
+//	}
 }
 
 //

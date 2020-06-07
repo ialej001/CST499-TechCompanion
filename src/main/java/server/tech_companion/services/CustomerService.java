@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import io.leangen.graphql.spqr.spring.annotations.GraphQLApi;
 import server.tech_companion.config.CommonMethods;
 import server.tech_companion.models.Customer;
-import server.tech_companion.models.Json.CustomerJson;
+import server.tech_companion.payload.CustomerJson;
 import server.tech_companion.repositories.CustomerRepository;
 
 @Service

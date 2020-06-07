@@ -1,4 +1,4 @@
-package server.tech_companion.models.Json;
+package server.tech_companion.payload;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,7 +24,7 @@ public class HistoryJson {
     private List<Part> partsUsed;
     private LocalDateTime timeStarted;
     private LocalDateTime timeEnded;
-    private LocalDateTime date; //deprecated
+    private LocalDateTime dispatched; //deprecated
     
     private Double subTotal;
     private Double total;

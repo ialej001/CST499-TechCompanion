@@ -12,13 +12,11 @@ import io.leangen.graphql.spqr.spring.annotations.GraphQLApi;
 import server.tech_companion.config.CommonMethods;
 import server.tech_companion.models.Part;
 import server.tech_companion.models.WorkOrder;
-import server.tech_companion.models.Json.*;
+import server.tech_companion.payload.*;
 import server.tech_companion.repositories.PartsRepository;
 import server.tech_companion.repositories.WorkOrderRepo;
 
 @Service
-@Component
-@GraphQLApi
 public class WorkOrderService {
     @Autowired
     private WorkOrderRepo workOrderRepo;
@@ -71,6 +69,8 @@ public class WorkOrderService {
     		DispatchJson json = new DispatchJson();
         	CommonMethods.copyNonNullProperties(workOrder, json);
         	CustomerJson customerJson = customerService.fetchCustomerByString_id(workOrder.getCustomer_id());
+        	if (customerJson == null)
+        		json.setCustomer(new CustomerJson());
         	json.setCustomer(customerJson);
         	customersJson.add(json);
         }

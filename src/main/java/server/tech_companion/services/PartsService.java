@@ -2,7 +2,7 @@ package server.tech_companion.services;
 
 import server.tech_companion.config.CommonMethods;
 import server.tech_companion.models.Part;
-import server.tech_companion.models.Json.PartJson;
+import server.tech_companion.payload.PartJson;
 import server.tech_companion.repositories.PartsRepository;
 
 import java.util.ArrayList;

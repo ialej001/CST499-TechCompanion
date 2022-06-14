@@ -20,4 +20,20 @@ public class Role {
 	public Role(ERole role) {
 		this.role = role;
 	}
+
+	public ObjectId getId() {
+		return id;
+	}
+
+	public void setId(ObjectId id) {
+		this.id = id;
+	}
+
+	public ERole getRole() {
+		return role;
+	}
+
+	public void setRole(ERole role) {
+		this.role = role;
+	}
 }

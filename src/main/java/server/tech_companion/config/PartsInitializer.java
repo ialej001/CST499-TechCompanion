@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -67,25 +68,26 @@ public class PartsInitializer {
 		}
 	}
 	
-//	@PostConstruct
-//	public void seedAdminAccount() throws IOException {
-//		try {
-//			if (userRepo.findAll().isEmpty()) {
-//				Set<Role> roles = new Set<Role>();
-//				User user = new User(
-//						ObjectId.get(), 
-//						"Monica", 
-//						"password", 
-//						"mx_alejandre1@yahoo.com", 
-//						roles);
-//			}
-//		} finally {
-//			System.out.println("Admin present");
+	@PostConstruct
+	public void seedAdminAccount() throws IOException {
+		try {
+			if (userRepo.findAll().isEmpty()) {
+				Set<Role> roles = new HashSet<Role>();
+				User user = new User(
+						ObjectId.get(), 
+						"admin", 
+						"password", 
+						"", 
+						roles);
+				userRepo.insert(user);
+			}
+		} finally {
+			System.out.println("Admin present");
+		}
+//		} catch(IOException e) {
+//			
 //		}
-////		} catch(IOException e) {
-////			
-////		}
-//	}
+	}
 }
 
 //

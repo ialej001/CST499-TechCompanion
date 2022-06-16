@@ -7,11 +7,11 @@
 		<version>2.2.6.RELEASE</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>server</groupId>
+	<groupId>com.ialej.aas</groupId>
 	<artifactId>tech_companion</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>demo</name>
-	<description>Demo project for Spring Boot</description>
+	<version>1.0.0</version>
+	<name>TechCompanionWebAPI</name>
+	<description>Web API for TechCompanion applications</description>
 	<packaging>jar</packaging>
 
 	<properties>
@@ -143,6 +143,11 @@
 			                </artifactItems>
 			            </configuration>
 			        </execution>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals><goal>copy-dependencies</goal></goals>
+					</execution>
 			    </executions>
 			</plugin>
 		</plugins>
